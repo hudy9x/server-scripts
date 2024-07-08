@@ -10,3 +10,11 @@ $ vim ram-usage.sh
 $ chmod +x ram-usage.sh
 $ nohup ./ram-usage.sh & > ram-usage-pid
 ```
+
+Create a service for running at startup
+
+```shell
+$ wget https://raw.githubusercontent.com/hudy9x/server-scripts/main/ram-usage-service.sh
+$ chmod +x ram-usage-service.sh
+$ ./ram-usage-service.sh
+```
