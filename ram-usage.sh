@@ -1,8 +1,17 @@
 #!/bin/bash
 
 # Axiom API details (replace with your actual values)
-API_TOKEN=""
-DATASET_NAME=""
+API_TOKEN="1"
+DATASET_NAME="1"
+ 
+# Sleep time variable (modify as needed)
+SLEEP_TIME=1
+
+# Note: To visualize Ram field on Axiom, run the following command 
+#
+# test
+# | where ['type'] == "RAM"
+# | summarize avg(toint(ram)) by bin(_time, 1m)
 
 if [[ -z "$API_TOKEN" || -z "$DATASET_NAME" ]]; then
   echo "Error: Both API_TOKEN and DATASET_NAME must be set. Please provide values for these variables."
@@ -13,25 +22,41 @@ fi
 function get_ram_usage() {
   # Use free command with -m flag for megabytes
   # ram_usage=$(free -m | awk '/Mem:/ {printf("%d", $3)}')  # Extract only used memory value
-  ram_usage=$(free -m | awk '/Mem:/ {printf("%d", $3/$2 * 100)}')
+  ram_usage=$(free -m | awk '/Mem:/ {printf("%.0f", $3/$2 * 100)}')
 
-  if [[ $ram_usage -le 20 ]]; then
-    ram_usage="L20"
-  elif [[ $ram_usage -le 30 ]]; then
-    ram_usage="L30"
-  elif [[ $ram_usage -le 40 ]]; then
-    ram_usage="L40"
-  elif [[ $ram_usage -le 50 ]]; then
-    ram_usage="L50"
-  elif [[ $ram_usage -le 70 ]]; then
-    ram_usage="L70"
-  elif [[ $ram_usage -le 80 ]]; then
-    ram_usage="L80"
-  elif [[ $ram_usage -le 90 ]]; then
-    ram_usage="L90"
-  else
-    ram_usage="L99"
-  fi
+  echo $ram_usage
+
+  # if [[ $ram_usage -le 20 ]]; then
+  #   ram_usage=20
+  #   # ram_usage="L20"
+  # elif [[ $ram_usage -le 30 ]]; then
+  #   ram_usage=30
+  # elif [[ $ram_usage -le 35 ]]; then
+  #   ram_usage=35
+  #   # ram_usage="L35"
+  # elif [[ $ram_usage -le 40 ]]; then
+  #   ram_usage=40
+  # elif [[ $ram_usage -le 45 ]]; then
+  #   ram_usage=45
+  #   # ram_usage="L45"
+  # elif [[ $ram_usage -le 50 ]]; then
+  #   ram_usage=50
+  # elif [[ $ram_usage -le 60 ]]; then
+  #   ram_usage=60
+  #   # ram_usage="L50"
+  # elif [[ $ram_usage -le 70 ]]; then
+  #   ram_usage=70
+  #   # ram_usage="L70"
+  # elif [[ $ram_usage -le 80 ]]; then
+  #   ram_usage=80
+  #   # ram_usage="L80"
+  # elif [[ $ram_usage -le 90 ]]; then
+  #   ram_usage=90
+  #   # ram_usage="L90"
+  # else
+  #   ram_usage=99
+  #   # ram_usage="L99"
+  # fi
 
 
   if [[ $? -ne 0 ]]; then
@@ -73,8 +98,7 @@ function start_scanning(){
   # Initialize empty array for RAM data
   ram_data_array=()
 
-  # Sleep time variable (modify as needed)
-  sleep_time=5
+
 
   # Loop to check RAM usage and store data
   for i in {1..12}; do
@@ -97,7 +121,7 @@ function start_scanning(){
     # echo $ram_data_object
     ram_data_array+=("$ram_data_object")
 
-    sleep $sleep_time
+    sleep $SLEEP_TIME
   done
 
   # Send data to Axiom with error handling
